@@ -1,0 +1,530 @@
+//   DEFINE 
+//#define CALIBRACION
+#define SERVOFAKTOR 640
+
+#define SERVOLEFTNULL 1800
+#define SERVORIGHTNULL 1000
+
+#define SERVOPINELEVADOR  2  
+#define SERVOPINIZQUIERDO  3 
+#define SERVOPINDERECHA 4 
+
+#define LIFT0 1080
+#define LIFT1 900
+#define LIFT2 825 
+
+#define VELOCIDADELEVADOR 1500
+
+#define L1 35
+#define L2 60
+#define L3 13.2
+
+#define O1X 22
+#define O1Y -25
+#define O2X 47
+#define O2Y -25
+
+//lector
+#define SD_ChipSelectPin 53
+//sensor
+#define S0 4
+#define S1 5
+#define S2 6
+#define S3 7
+#define salidaTCS 8
+
+//   INCLUDE
+#include <Servo.h>
+#include <SD.h>  
+#include <SPI.h>
+#include <TMRpcm.h>  
+//   VARIABLES
+
+TMRpcm Audio; 
+
+int servoLift = 1500;
+
+Servo servo1;  // 
+Servo servo2;  // 
+Servo servo3;  //  
+
+volatile double lastX = 75;
+volatile double lastY = 47.5;
+
+int last_min = 0;
+
+
+int iniciox=20;
+int inicioy=5;
+int valor;
+int i=0;
+
+int num1;
+int operacion;
+int num2;
+int igual;
+
+int numero=0;
+//   SETUP
+
+void setup()
+{
+  //servos
+  Serial.begin(9600);
+  drawTo(75.2, 47);
+  lift(0);
+  servo1.attach(SERVOPINELEVADOR);  //  servo elevador 
+  servo2.attach(SERVOPINIZQUIERDO);  //  servo izquierdo
+  servo3.attach(SERVOPINDERECHA);  //  servo derecho
+ //lector
+  Audio.speakerPin = 11;
+  Audio.quality(1);
+  Audio.setVolume(6);
+
+  Serial.println("Inicializando");
+   if (!SD.begin(SD_ChipSelectPin)) {  // Comprueba si la tarjeta SD se ha inicializado correctamente
+    Serial.println("Fallo de la tarjeta SD, revisa las conexiones papu :v");  
+    return;   // Si la tarjeta SD falla, el programa termina
+  }
+  else{
+    Serial.println("SD inicializada correctamente!");
+      }
+
+ //sensor
+  pinMode(S0, OUTPUT);
+  pinMode(S1, OUTPUT);
+  pinMode(S2, OUTPUT);
+  pinMode(S3, OUTPUT);
+  pinMode(salidaTCS, INPUT);
+
+  digitalWrite(S0, HIGH);
+  digitalWrite(S1, LOW);
+}
+  
+  void loop()
+  {
+ #ifdef CALIBRACION
+ 
+  drawTo(-3, 29.2);
+  delay(2000);
+  drawTo(74.1, 28);
+  delay(2000);
+#else
+
+  if (!servo1.attached()) servo1.attach(SERVOPINELEVADOR);
+  if (!servo2.attached()) servo2.attach(SERVOPINIZQUIERDO);
+  if (!servo3.attached()) servo3.attach(SERVOPINDERECHA);
+
+  
+digitalWrite(S2, LOW);// rojo
+  digitalWrite(S3, LOW);
+  int rojo= pulseIn(salidaTCS, LOW);
+  delay(200);
+
+  digitalWrite(S2, HIGH);// verde
+  digitalWrite(S3, HIGH);
+  int verde= pulseIn(salidaTCS, LOW);
+  delay(200);
+
+  digitalWrite(S2, LOW);//azul
+  digitalWrite(S3, HIGH);
+  int azul= pulseIn(salidaTCS, LOW);
+  delay(200);
+  
+
+lift(0);
+if (15900 <rojo && rojo <16600 && 2400 <verde && verde< 2500 && 10800 <azul && azul <11900  )
+  {
+    delay (200);
+    Serial.println("dos");
+    num1=2;
+    number(iniciox, inicioy, num1, 0.9);
+    iniciox=iniciox+14;
+  }
+  if (15800 <rojo && rojo <16400 && 1700 <verde && verde< 1900 && 10600 <azul && azul <10900  )
+  {
+    delay (200);
+    Serial.println("tres");
+    num1=3;
+    number(iniciox, inicioy, num1, 0.9);
+    iniciox=iniciox+14;
+    }
+   if (15900 <rojo && rojo <16400 && 2900 <verde && verde< 3200 && 10800 <azul && azul <11100  )
+  {
+    delay (200);
+    Serial.println("cuatro");
+   num1=4;
+    number(iniciox, inicioy, num1, 0.9);
+    iniciox=iniciox+14;
+  }
+  if (15800 <rojo && rojo <16500 && 1400 <verde && verde< 1600 && 10700 <azul && azul <11000  )
+  {
+    delay (200);
+    Serial.println("cinco");
+    num1=5;
+    number(iniciox, inicioy, num1, 0.9);
+    iniciox=iniciox+14;
+  }
+if (1800 <rojo && rojo <16500 && 700 <verde && verde< 1400 && 10600 <azul && azul <11500  )
+  {
+    delay (200);
+    Serial.println("seis");
+     num1=6;
+    number(iniciox, inicioy, num1, 0.9);
+    iniciox=iniciox+14;
+  }
+ if (15500 <rojo && rojo <16400 && 90 <verde && verde< 500 && 11000 <azul && azul <11300  )
+  {
+    delay (200);
+    Serial.println("siete");
+     num1=7;
+    number(iniciox, inicioy, num1, 0.9);
+    iniciox=iniciox+14;
+  }
+  if (16000 <rojo && rojo <16300 && 10 <verde && verde< 1900 && 10700 <azul && azul <11200  )
+  {
+    delay (200);
+    Serial.println("ocho");
+     num1=8;
+    number(iniciox, inicioy, num1, 0.9);
+    iniciox=iniciox+14;
+  }
+  if (25500 <rojo && rojo <25900 && 1900 <verde && verde< 200 && 12500 <azul && azul <12650  )
+  {
+    delay (200);
+    Serial.println("nueve");
+    num1=9;
+    number(iniciox, inicioy, num1, 0.9);
+    iniciox=iniciox+14;
+  }
+  if (15800 <rojo && rojo <16400 && 2000 <verde && verde< 5000 && 10500 <azul && azul <11000  )
+  {
+    delay (200);
+    Serial.println("menos");
+    operacion= -1; 
+    number(iniciox, inicioy, operacion, 0.9);
+    iniciox=iniciox+14;
+  }
+  if (15500<rojo && rojo <16300 && 1600 <verde && verde< 2300 && 10700 <azul && azul <11000  )
+  {
+    delay (200);
+    Serial.println("mas");
+    operacion= -2; 
+    number(iniciox, inicioy, operacion, 0.9);
+    iniciox=iniciox+14;
+  }
+
+if (16000 <rojo && rojo <16200 && 400 <verde && verde< 800 && 10500 <azul && azul <11000  )
+  {
+    delay (200);
+    Serial.println("igual");
+    igual=-3; 
+    number(iniciox, inicioy, igual, 0.9);
+    iniciox= iniciox+14;
+  }
+    switch (operacion) {
+        case -2://suma
+          if((num1+num2)<10){
+            number(iniciox, inicioy, num1+num2, 0.9);
+          }
+          else{
+            int resultado = (num1+num2)/10;
+            number(iniciox, inicioy, resultado, 0.9);
+            resultado = (num1+num2)%10;
+            iniciox=iniciox+10;
+            number(iniciox, inicioy, resultado, 0.9);
+          }
+          break;
+        case -1://resta
+          if((num1-num2)>=0){
+            number(iniciox, inicioy, num1-num2, 0.9);
+          }
+          else{
+            int resultado = abs(num1-num2);
+            number(iniciox, inicioy, -3, 0.9);
+            iniciox=iniciox+10;
+            number(iniciox, inicioy, resultado, 0.9);
+          }
+          break;
+    }
+    iniciox=0;
+#endif
+return;
+  }
+  void number(float bx, float by, int num, float scale) {
+ 
+  switch (num) {
+
+  case 0:
+    lift(1);
+    drawTo(bx + 12 * scale, by + 6 * scale);
+    lift(0);
+    bogenGZS(bx + 7 * scale, by + 10 * scale, 10 * scale, -0.8, 6.7, 0.5);
+    break;
+  case 1:
+     lift(1);
+    drawTo(bx + 3 * scale, by + 15 * scale);
+    lift(0);
+    drawTo(bx + 10 * scale, by + 20 * scale);
+    drawTo(bx + 10 * scale, by + 0 * scale);
+    Audio.play("1.wav");
+    break;
+  case 2:
+     lift(1);
+    drawTo(bx + 2 * scale, by + 12 * scale);
+    lift(0);
+    bogenUZS(bx + 8 * scale, by + 14 * scale, 6 * scale, 3, -0.8, 1);
+    drawTo(bx + 1 * scale, by + 0 * scale);
+    drawTo(bx + 12 * scale, by + 0 * scale);
+    Audio.play("2.wav");
+    break;
+  case 3:
+    lift(1);
+    drawTo(bx + 2 * scale, by + 17 * scale);
+    lift(0);
+    bogenUZS(bx + 5 * scale, by + 15 * scale, 5 * scale, 3, -2, 1);
+    bogenUZS(bx + 5 * scale, by + 5 * scale, 5 * scale, 1.57, -3, 1);
+   Audio.play("3.wav");
+    break;
+  case 4:
+    lift(1);
+    drawTo(bx + 10 * scale, by + 0 * scale);
+    lift(0);
+    drawTo(bx + 10 * scale, by + 20 * scale);
+    drawTo(bx + 2 * scale, by + 6 * scale);
+    drawTo(bx + 12 * scale, by + 6 * scale);
+    Audio.play("4.wav");
+    break;
+  case 5:
+    lift(1);
+    drawTo(bx + 2 * scale, by + 5 * scale);
+    lift(0);
+    bogenGZS(bx + 5 * scale, by + 6 * scale, 6 * scale, -2.5, 2, 1);
+    drawTo(bx + 5 * scale, by + 20 * scale);
+    drawTo(bx + 12 * scale, by + 20 * scale);
+    Audio.play("5.wav");
+    break;
+  case 6:
+    lift(1);
+    drawTo(bx + 2 * scale, by + 10 * scale);
+    lift(0);
+    bogenUZS(bx + 7 * scale, by + 6 * scale, 6 * scale, 2, -4.4, 1);
+    drawTo(bx + 11 * scale, by + 20 * scale);
+    Audio.play("6.wav");
+    break;
+  case 7:
+    lift(1);
+    drawTo(bx + 2 * scale, by + 20 * scale);
+    lift(0);
+    drawTo(bx + 12 * scale, by + 20 * scale);
+    drawTo(bx + 2 * scale, by + 0);
+    Audio.play("7.wav");
+    break;
+  case 8:
+    lift(1);
+    drawTo(bx + 5 * scale, by + 10 * scale);
+    lift(0);
+    bogenUZS(bx + 5 * scale, by + 15 * scale, 5 * scale, 4.7, -1.6, 1);
+    bogenGZS(bx + 5 * scale, by + 5 * scale, 5 * scale, -4.7, 2, 1);
+    Audio.play("8.wav");
+    break;
+
+  case 9:
+    lift(1);
+    drawTo(bx + 9 * scale, by + 11 * scale);
+    lift(0);
+    bogenUZS(bx + 7 * scale, by + 15 * scale, 5 * scale, 4, -0.5, 1);
+    drawTo(bx + 5 * scale, by + 0);
+    Audio.play("9.wav");
+    break;
+
+  
+  
+  case -1:  // Resta
+      lift(1);
+      drawTo(bx +1*scale, by+10*scale);
+      lift(0);
+      drawTo(bx + 11 * scale, by + 10 * scale);
+      break;
+    
+  case -2:  // Suma
+      lift(1);
+      drawTo(bx+1*scale, by+10*scale);
+      lift(0);
+      drawTo(bx + 11 * scale, by + 10 * scale);
+      lift(1);
+      drawTo(bx+5*scale, by+15*scale);
+      lift(0);
+      drawTo(bx + 5 * scale, by + 5 * scale);
+      break;
+      
+      
+  case -3:  // Igual
+      lift(1);
+      drawTo(bx+1*scale, by+13*scale);
+      lift(0);
+      drawTo(bx + 11 * scale, by+13*scale);
+      lift(1);
+      drawTo(bx+1*scale, by+7*scale);
+      lift(0);
+      drawTo(bx + 11 * scale, by+7*scale);
+      break;
+  }
+}
+
+
+
+void lift(char lift) {
+  switch (lift) {
+    // sitio para optimizar  !
+
+  case 0: //850
+
+      if (servoLift >= LIFT0) {
+      while (servoLift >= LIFT0) 
+      {
+        servoLift--;
+        servo1.writeMicroseconds(servoLift);        
+        delayMicroseconds(VELOCIDADELEVADOR);
+      }
+    } 
+    else {
+      while (servoLift <= LIFT0) {
+        servoLift++;
+        servo1.writeMicroseconds(servoLift);
+        delayMicroseconds(VELOCIDADELEVADOR);
+
+      }
+
+    }
+
+    break;
+
+  case 1: //150
+
+    if (servoLift >= LIFT1) {
+      while (servoLift >= LIFT1) {
+        servoLift--;
+        servo1.writeMicroseconds(servoLift);
+        delayMicroseconds(VELOCIDADELEVADOR);
+
+      }
+    } 
+    else {
+      while (servoLift <= LIFT1) {
+        servoLift++;
+        servo1.writeMicroseconds(servoLift);
+        delayMicroseconds(VELOCIDADELEVADOR);
+      }
+
+    }
+
+    break;
+
+  case 2:
+
+    if (servoLift >= LIFT2) {
+      while (servoLift >= LIFT2) {
+        servoLift--;
+        servo1.writeMicroseconds(servoLift);
+        delayMicroseconds(VELOCIDADELEVADOR);
+      }
+    } 
+    else {
+      while (servoLift <= LIFT2) {
+        servoLift++;
+        servo1.writeMicroseconds(servoLift);        
+        delayMicroseconds(VELOCIDADELEVADOR);
+      }
+    }
+    break;
+  }
+}
+
+
+void bogenUZS(float bx, float by, float radius, int start, int ende, float sqee) {
+  float inkr = -0.05;
+  float count = 0;
+
+  do {
+    drawTo(sqee * radius * cos(start + count) + bx,
+    radius * sin(start + count) + by);
+    count += inkr;
+  } 
+  while ((start + count) > ende);
+
+}
+
+void bogenGZS(float bx, float by, float radius, int start, int ende, float sqee) {
+  float inkr = 0.05;
+  float count = 0;
+
+  do {
+    drawTo(sqee * radius * cos(start + count) + bx,
+    radius * sin(start + count) + by);
+    count += inkr;
+  } 
+  while ((start + count) <= ende);
+}
+
+
+void drawTo(double pX, double pY) {
+  double dx, dy, c;
+  int i;
+
+  // dx dy of new point
+  dx = pX - lastX;
+  dy = pY - lastY;
+  // Longitud de la trayectoria en mm, 4 veces equivale a 4 pasos por mm
+  c = floor(4 * sqrt(dx * dx + dy * dy));
+
+  if (c < 1) c = 1;
+
+  for (i = 0; i <= c; i++) {
+    // dibuja la lÌnea punto por punto
+    set_XY(lastX + (i * dx / c), lastY + (i * dy / c));
+
+  }
+
+  lastX = pX;
+  lastY = pY;
+}
+
+double return_angle(double a, double b, double c) {
+  // regla del coseno para el angulo entre c y a
+  return acos((a * a + c * c - b * b) / (2 * a * c));
+}
+
+void set_XY(double Tx, double Ty) 
+{
+  delay(1);
+  double dx, dy, c, a1, a2, Hx, Hy;
+
+  //calcular triangulo entre marcador, servo izquierdo y brazo
+  // cartesiano dx/dy
+  dx = Tx - O1X;
+  dy = Ty - O1Y;
+
+  // longitud polar (c)  y el angulo (a1)
+  c = sqrt(dx * dx + dy * dy); 
+  a1 = atan2(dy, dx); 
+  a2 = return_angle(L1, L2, c);
+
+  servo2.writeMicroseconds(floor(((a2 + a1 - M_PI) * SERVOFAKTOR) + SERVOLEFTNULL));
+
+  // calcular el punto del brazo joinr para el tri·ngulo del  servo derecho y el brazo
+  a2 = return_angle(L2, L1, c);
+  Hx = Tx + L3 * cos((a1 - a2 + 0.621) + M_PI); //36,5∞
+  Hy = Ty + L3 * sin((a1 - a2 + 0.621) + M_PI);
+
+  // calcular el tri·ngulo entre el marcador, servo derecho y el brazo
+  dx = Hx - O2X;
+  dy = Hy - O2Y;
+
+  c = sqrt(dx * dx + dy * dy);
+  a1 = atan2(dy, dx);
+  a2 = return_angle(L1, (L2 - L3), c);
+
+  servo3.writeMicroseconds(floor(((a1 - a2) * SERVOFAKTOR) + SERVORIGHTNULL));
+
+}
